@@ -1,3 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Overpass&family=Source+Sans+Pro&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+    h1 {
+        @apply font-overpass font-bold text-[60px]
+    }
+    h2 {
+        @apply font-overpass font-bold text-[48px]
+    }
+    h3 {
+        @apply font-overpass font-medium text-[40px]
+    }
+    h4 {
+        @apply font-overpass font-normal text-[28px]
+    }
+    h5 {
+        @apply font-overpass font-bold text-[18px]
+    }
+}
