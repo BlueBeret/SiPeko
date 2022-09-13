@@ -20,4 +20,7 @@
     h5 {
         @apply font-overpass font-bold text-[18px]
     }
+    strong {
+        @apply font-extrabold text-[18px]
+    }
 }

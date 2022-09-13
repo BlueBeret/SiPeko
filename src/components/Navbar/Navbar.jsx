@@ -13,21 +13,25 @@ export default function Navbar() {
 
                 <div className="menu flex items-center gap-6  text-center ml-auto">
                     <Link href="/">
-                        <div className="font-overpass font-light text-[24px] hover:cursor-pointer hover:underline">home</div>
+                        <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">home</div>
                     </Link >
 
                     <Link href="/event">
-                        <div className="font-overpass font-light text-[24px] hover:cursor-pointer hover:underline">event</div>
+                        <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">event</div>
                     </Link>
 
                     <Link href="/vote" >
-                        <div className="font-overpass font-light text-[24px] hover:cursor-pointer hover:underline">vote</div>
+                        <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">vote</div>
+                    </Link>
+                    <Link href="/about" >
+                        <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">about</div>
                     </Link>
                     <BtnHref>
                         <Link href="/login">
                             Login
                         </Link>
                     </BtnHref>
+                    
 
 
 
