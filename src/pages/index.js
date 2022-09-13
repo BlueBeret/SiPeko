@@ -1,5 +1,7 @@
 import Head from 'next/head'
 import Image from 'next/image'
+import { BtnActions } from '@/components/buttons'
+import Link from 'next/link'
 
 export default function Home() {
   return (<div className="w-full  grow bg-[#E7E2F2] flex justify-between items-center">
@@ -13,7 +15,11 @@ export default function Home() {
       </div>
       
       <h3 className="text-secondary-500 mt-6">Sistem Pemilihan Ketua OSIS</h3>
-      <div className="bg-primary-600 text-white w-max font-bold px-4 py-2 rounded-full hover:cursor-pointer">Buat event baru</div>
+      <BtnActions>
+        <Link href="/admin">
+        Buat event baru
+        </Link>
+      </BtnActions>
     </div>
     <div>
       <Image src="/assets/images/votingq.png" width={950} height={576}></Image>
