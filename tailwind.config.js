@@ -44,10 +44,14 @@ module.exports = {
         info: {
           500: '#6FBAFC',
           600: '#5192D8'
+        }, 
+        bg: {
+          100: '#E7E2F2',
+          200: '#F6F2F8'
         }
       },
       fontFamily: {
-        overpass: ["overpass", 'sans-serif'],
+        overpass: ["Overpass", 'sans-serif'],
         sans: ['Source\\ Sans\\ Pro', 'sans-serif']
 
       }
