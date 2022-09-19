@@ -16,7 +16,7 @@ export default function Navbar() {
                         <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">home</div>
                     </Link >
 
-                    <Link href="/event">
+                    <Link href="/admin?menu =event">
                         <div className="font-overpass font-thin text-[24px] hover:cursor-pointer hover:underline">event</div>
                     </Link>
 
