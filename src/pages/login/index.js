@@ -1,13 +1,44 @@
 import { BtnActions } from '@/components/buttons'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
+import Swal from 'sweetalert2'
+
+
+import axios from 'axios'
+import hash from '@/utils/hash'
 
 const Login = () => {
-    const [username, setUsername] = useState()
-    const [password, setPassword] = useState()
+    const [username, setUsername] = useState('')
+    const [password, setPassword] = useState('')
 
+    const login = () => {
+        Swal.fire({
+            title: "Logging in",
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+        })
+        axios({
+            method: 'post',
+            url: '/api/auth/login',
+            data: {
+                username: username,
+                hashpass: hash(password) 
+            },
+            withCredentials: true
+        }).then(res => document.location = '/admin')
+            .catch(res => {
+                Swal.hideLoading()
+                Swal.update({
+                    title: res.response.data.err,
+                    icon: 'error'
+                })
+            })
+    }
     return <div className="flex grow flex-col items-center justify-start bg-bg-100">
         <Head>
             <title>Login</title>
@@ -26,16 +57,16 @@ const Login = () => {
             </div>
             <div className="flex flex-col items-end w-full gap-2">
                 <div>
-                <BtnActions handleClick={() => alert(`${username}:${password}`)} >
-                    Login
-                </BtnActions>
+                    <BtnActions handleClick={() => login()} >
+                        Login
+                    </BtnActions>
                 </div>
                 <p className="font-sans text-[16px]">Belum punya akun? Daftar <span className="text-primary-700 underline font-bold"><Link href="/register">disini
                 </Link></span></p>
                 <div>
 
                 </div>
-                
+
             </div>
         </div>
 
