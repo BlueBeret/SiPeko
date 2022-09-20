@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Swal from 'sweetalert2'
 
 import VotingChart from './VotingChart'
+import { BtnSuccess } from '../buttons'
 
 const EventDetail = () => {
     const router = useRouter()
@@ -48,6 +49,16 @@ const EventDetail = () => {
         })
     }
 
+    function toClip() {
+        navigator.clipboard.writeText("http://localhost:3000" + "/vote?eid=" + eid)
+        Swal.fire({
+            title: 'Link berhasil disalin',
+            timer: 2000,
+            showConfirmButton: false,
+            icon: 'success'
+        })
+    }
+
     if (details === undefined) {
         return <div className="flex-grow flex flex-col items-center pt-10 bg-bg-100">
             {renderLoading()}
@@ -59,7 +70,7 @@ const EventDetail = () => {
                 <h4 className='text-primary-700'>Hasil</h4>
                 <h4 className='text-primary-700 capitalize'>{details.nama || ""}</h4>
             </div>
-            <div className='flex flex-row items-center flex-grow'>
+            <div className='flex flex-row items-center flex-grow gap-4'>
                 <div className='flex flex-row gap-10'>
                     <div className='max-w-[300px] p-4'>
                         <VotingChart data={hasil} />
@@ -82,6 +93,9 @@ const EventDetail = () => {
                                 </tr>
                         })}
                     </table>
+                </div>
+                <div className='flex flex-col'>
+                    <BtnSuccess handleClick={() => toClip()}> copy vote link </BtnSuccess>
                 </div>
             </div>
         </div>
