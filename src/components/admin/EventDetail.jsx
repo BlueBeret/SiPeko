@@ -18,6 +18,8 @@ const EventDetail = () => {
         { title: 'Three', value: 20, color: '#6A2135' },
     ])
 
+    const colors = [generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor(), generateRandomColor()]
+
 
     useEffect(() => {
         axios("/api/event/" + eid, { withCredentials: true }).then((res) => {
@@ -27,17 +29,32 @@ const EventDetail = () => {
 
         axios("/api/calon/" + eid, { withCredentials: true }).then((res) => {
             setCalon(res.data)
-            let tmp = res.data.map((v) => {
+            let tmp = res.data.map((v, i) => {
                 return {
                     title: v.nama,
                     value: v.score,
-                    color: generateRandomColor()
+                    color: colors[i]
                 }
             })
-            console.log(tmp)
             sethasil(tmp)
         })
 
+        const interval = setInterval(() => {
+            axios("/api/calon/" + eid, { withCredentials: true }).then((res) => {
+                setCalon(res.data)
+                let tmp = res.data.map((v, i) => {
+                    return {
+                        title: v.nama,
+                        value: v.score,
+                        color: colors[i]
+                    }
+                })
+                sethasil(tmp)
+            })
+        }, 5000);
+        return () => {
+            clearInterval(interval);
+        };
     }, [])
 
     function renderLoading() {
@@ -79,18 +96,18 @@ const EventDetail = () => {
                     <table className='flex flex-col items-start justify-center gap-4'>
                         {hasil.map((v, i) => {
                             return <tr key={v.title}>
-                                    <td>
-                                        <span className={`px-3 py-1`} style={{
-                                            background: v.color
-                                        }}></span>
-                                    </td>
-                                    <td>
-                                        <span className='ml-2'>{v.title}</span>
-                                    </td>
-                                    <td>
-                                        <span className='ml-4'>({v.value})</span>
-                                    </td>
-                                </tr>
+                                <td>
+                                    <span className={`px-3 py-1`} style={{
+                                        background: v.color
+                                    }}></span>
+                                </td>
+                                <td>
+                                    <span className='ml-2'>{v.title}</span>
+                                </td>
+                                <td>
+                                    <span className='ml-4'>({v.value})</span>
+                                </td>
+                            </tr>
                         })}
                     </table>
                 </div>
