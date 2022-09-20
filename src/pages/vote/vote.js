@@ -7,14 +7,32 @@ import { BtnInfo, BtnSuccess, BtnDanger } from '@/components/buttons'
 import ReactDOMServer from 'react-dom/server';
 import { useState } from "react";
 
-export default function Vote({ namasekolah, listCalon }) {
+import axios from 'axios'
+
+export default function Vote({ namasekolah, calondefault }) {
+    const [listCalon, setListCalon] = useState(calondefault)
+
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL
+
+    useState(() => {
+        axios.get('/api/vote/calon', { withCredentials: true })
+            .then((res) => {
+                const data = res.data.map((v) => {
+                    v.img = BACKEND_URL + v.img
+                    return v
+                })
+            setListCalon(data)
+            }).catch((res) => {
+            console.log(res)
+        })
+    }, [])
 
     const lihatMisi = (v) => {
         const content = <li className="flex flex-col items-center w-full pb-5 px-5 gap-2">
             <Image src={v.img} width={197} height={197}>
             </Image>
             <h5 className="uppercase font-extrabold">
-                {v.name}
+                {v.nama}
             </h5>
             <ul className="gap-2 mt-2 mb-4">
                 {(v.misi.split(';')).map((v, i) => {
@@ -36,7 +54,6 @@ export default function Vote({ namasekolah, listCalon }) {
             willOpen: () => {
                 const tutup = document.querySelector('#tutup')
                 tutup.addEventListener('click', () => {
-                    console.log('closed')
                     Swal.close()
                 })
             }
@@ -51,7 +68,7 @@ export default function Vote({ namasekolah, listCalon }) {
         </div>
 
         Swal.fire({
-            title: "Anda yakin ingin memilih <span style=color:#878CF0>"+calon.name+"</span>?",
+            title: "Anda yakin ingin memilih <span style=color:#878CF0>"+calon.nama+"</span>?",
             html: ReactDOMServer.renderToStaticMarkup(ControlButton),
             background: '#F6F2F8',
             showConfirmButton: false,
@@ -66,8 +83,25 @@ export default function Vote({ namasekolah, listCalon }) {
                     ya.style.display = 'none'
                     tidak.style.display = 'none'
                     Swal.showLoading()
-                    alert('nice')
-                    Swal.close()
+                    axios.post('/api/vote', { sidc: calon.sid }, { withCredentials: true }).then(() => {
+                        Swal.close()
+                        Swal.fire({
+                            title: "Terima Kasih karena sudah berpartisipasi dalam pemilihan ini",
+                            icon: "success",
+                            timer: "2000",
+                            showConfirmButton: false,
+                            showLoading: true,
+                            didClose: () => {
+                                axios.get('/api/vote/logout', { withCredentials: true })
+                                    .then(res => {
+                                    document.location = "/vote?eid="+ listCalon[0].eid
+                                })
+                            }
+
+                        })
+                    }
+                    )
+                    
                 })
             }
 
@@ -86,7 +120,7 @@ export default function Vote({ namasekolah, listCalon }) {
                     <Image src={v.img} width={197} height={197}>
                     </Image>
                     <h5 className="uppercase font-extrabold">
-                        {v.name}
+                        {v.nama}
                     </h5>
                     <p className="font-[16px] font-medium text-center mt-2">
                         {v.visi}
@@ -105,24 +139,24 @@ export async function getServerSideProps({ query }) {
     return {
         props: {
             namasekolah: "SMA Lorem Ipsum 20",
-            listCalon: [
+            calondefault: [
                 {
-                    "id": 123456,
-                    "name": "Green Wright",
+                    "sid": 123456,
+                    "nama": "Green Wright",
                     "visi": "Minim quis quis ad est adipisicing. Minim id tempor non occaecat consectetur laboris sit nostrud commodo. Aliquip id est labore ad pariatur nisi proident exercitation tempor ex.",
                     "misi": "Laboris deserunt magna sit irure incididunt.;Enim est ullamco commodo do consequat duis et tempor consequat sit.;Ea consectetur ex laborum irure irure mollit anim occaecat.",
                     "img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADFCAYAAAAPD43zAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAH7SURBVHgB7dOhEYAwAACx0nlxSASweA+B5EdIdsi2H+c95rwG8FnrmQP4EQOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgPACpzwGZH68lbUAAAAASUVORK5CYII="
                 },
                 {
-                    "id": 123457,
-                    "name": "Francis Walter",
+                    "sid": 123457,
+                    "nama": "Francis Walter",
                     "visi": "Adipisicing dolore ea eiusmod id ad adipisicing et quis tempor do. Non cillum aliqua consectetur officia minim enim excepteur minim voluptate amet enim minim reprehenderit. Non ex nostrud ad aliquip.",
                     "misi": "Esse voluptate fugiat sunt est aliqua deserunt.;Cupidatat deserunt culpa consectetur sunt laboris eu exercitation sint.;Minim duis nulla consequat dolore veniam nulla excepteur.",
                     "img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADFCAYAAAAPD43zAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAH7SURBVHgB7dOhEYAwAACx0nlxSASweA+B5EdIdsi2H+c95rwG8FnrmQP4EQOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgPACpzwGZH68lbUAAAAASUVORK5CYII="
                 },
                 {
-                    "id": 123156,
-                    "name": "Lilly Calhoun",
+                    "sid": 123156,
+                    "nama": "Lilly Calhoun",
                     "visi": "Aliqua et id aute deserunt do laborum consectetur adipisicing ut. Sit duis magna consequat nisi minim sint. Et duis enim adipisicing veniam deserunt quis quis eiusmod mollit amet pariatur dolore cillum.",
                     "misi": "Est aliqua ea consequat cupidatat dolor occaecat deserunt elit esse.;Veniam laboris aliquip consequat consequat dolor sint Lorem occaecat dolor magna tempor velit veniam irure.;Aliqua laborum dolore enim irure ut incididunt.",
                     "img": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMYAAADFCAYAAAAPD43zAAAACXBIWXMAAAsTAAALEwEAmpwYAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAH7SURBVHgB7dOhEYAwAACx0nlxSASweA+B5EdIdsi2H+c95rwG8FnrmQP4EQOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgCAGBDEgiAFBDAhiQBADghgQxIAgBgQxIIgBQQwIYkAQA4IYEMSAIAYEMSCIAUEMCGJAEAOCGBDEgPACpzwGZH68lbUAAAAASUVORK5CYII="
