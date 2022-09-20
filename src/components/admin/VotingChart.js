@@ -29,7 +29,7 @@ function FullOption(props) {
       onClick={(_, index) => {
         setSelected(index === selected ? undefined : index);
       }}
-      label={({ dataEntry }) => Math.round(dataEntry.percentage) + '%'}
+      label={({ dataEntry }) => dataEntry.percentage > 0?Math.round(dataEntry.percentage) + '%' : ''}
       labelPosition={100 - lineWidth / 2}
       labelStyle={{
         fill: '#fff',
