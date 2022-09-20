@@ -6,13 +6,14 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Head from 'next/head'
 
-const Login = ({ namasekolah, id }) => {
+import axios from 'axios'
+
+const Login = ({ namasekolah, eid }) => {
     const [username, setUsername] = useState()
     const [password, setPassword] = useState()
 
     useEffect(() => {
-        console.log(id)
-        if (id === 0) {
+        if (eid === 0) {
             Swal.fire(
                 {
                     icon: 'error',
@@ -26,6 +27,34 @@ const Login = ({ namasekolah, id }) => {
         }
     }, [])
 
+    const login = () => {
+        Swal.fire({
+            title: "Logging in",
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            allowEscapeKey: false,
+            allowOutsideClick: false,
+        })
+        axios({
+            method: 'post',
+            url: '/api/vote/login',
+            data: {
+                nomor_induk: username,
+                kode_akses: password,
+                eid: eid,
+            },
+            withCredentials: true
+        }).then(res => document.location = '/vote/vote')
+            .catch(res => {
+                Swal.hideLoading()
+                Swal.update({
+                    title: res.response.data.err,
+                    icon: 'error'
+                })
+            })
+    }
+
     return <div className="flex grow flex-col items-center justify-start bg-bg-100">
         <Head>
             <title>Vote</title>
@@ -34,7 +63,7 @@ const Login = ({ namasekolah, id }) => {
         <div className="flex flex-col items-start w-[300px] mt-20 gap-5">
             <div className="flex flex-col items-start gap-2 w-full">
                 <div className="font-sans font-semibold text-lg">
-                    Username</div>
+                    Nomor Induk</div>
                 <input className="px-4 py-2 rounded-lg w-full" type="text" placeholder="username" value={username} onChange={e => setUsername(e.target.value)}></input>
             </div>
             <div className="flex flex-col items-start gap-2 w-full">
@@ -44,7 +73,7 @@ const Login = ({ namasekolah, id }) => {
             </div>
             <div className="flex flex-col items-end w-full gap-2">
                 <div>
-                    <BtnActions handleClick={() => alert(`${username}:${password}`)} >
+                    <BtnActions handleClick={() => login()} >
                         Vote
                     </BtnActions>
                 </div>
@@ -56,18 +85,18 @@ const Login = ({ namasekolah, id }) => {
 }
 
 export async function getServerSideProps({ query }) {
-    const id = query.id || 0
-    if (id === 0) {
+    const eid = query.eid || 0
+    if (eid === 0) {
         return {
             props: {
-                id: 0
+                eid: 0
             }
         }
     }
     return {
         props: {
-            id: id,
-            namasekolah: "SMP Negeri " + id + " Lorem Ipsum"
+            eid: eid,
+            namasekolah: "SMP Negeri " + eid + " Lorem Ipsum"
         }
     }
 }
