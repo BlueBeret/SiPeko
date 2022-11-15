@@ -125,7 +125,7 @@ export default function Vote({ namasekolah, calondefault }) {
                     <p className="font-[16px] font-medium text-center mt-2">
                         {v.visi}
                     </p>
-                    <div className="flex justify-between w-full mt-2">
+                    <div className="flex justify-between w-full mt-2 flex-grow items-end">
                         <BtnInfo handleClick={() => lihatMisi(v)}>Lihat Misi</BtnInfo>
                         <BtnSuccess handleClick={() => vote(v)}>Pilih Calon</BtnSuccess>
                     </div>
